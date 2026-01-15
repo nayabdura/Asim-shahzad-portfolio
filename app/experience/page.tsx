@@ -56,7 +56,7 @@ const experienceData: ExperienceItem[] = [
 
 const ExperienceSection = () => {
   return (
-    <section className="py-16 md:py-10 bg-[#f9f9fa] px-6 md:px-16 lg:px-24">
+    <section id="experience" className="bg-transparent py-16 md:py-10 bg-[#f9f9fa] px-6 md:px-16 lg:px-24">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="mb-12">

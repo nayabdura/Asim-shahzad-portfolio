@@ -10,7 +10,7 @@ const logos = [
 
 const PartnersSection = () => {
   return (
-    <section className="bg-white w-full py-20 overflow-hidden">
+    <section id= "what-we-do" className="bg-transparent w-full py-20 overflow-hidden">
       <div className="text-center mb-16">
         <h6 className="text-purple-600 uppercase tracking-widest text-xs font-bold mb-4">Our Partners</h6>
         <h2 className="text-gray-900 text-3xl md:text-4xl font-extrabold tracking-tight">
@@ -18,7 +18,7 @@ const PartnersSection = () => {
         </h2>
       </div>
 
-      <div className="relative flex overflow-hidden group">
+      <div className="relative flex overflow-hidden bg-transparent group">
         <motion.div 
           className="flex whitespace-nowrap"
           animate={{ x: ["0%", "-50%"] }}
@@ -41,7 +41,7 @@ const PartnersSection = () => {
           ))}
         </motion.div>
       </div>
-      <div className="relative flex overflow-hidden pt-2 group">
+      <div className="relative flex overflow-hidden  bg-none pt-2 group">
         <motion.div 
           className="flex whitespace-nowrap"
           animate={{ x: ["0%", "-50%"] }}

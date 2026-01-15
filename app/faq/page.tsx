@@ -87,7 +87,7 @@ const FAQSection = () => {
 
 const FAQItem = ({ faq, isOpen, onClick }: { faq: any, isOpen: boolean, onClick: () => void }) => {
   return (
-    <div 
+    <div  id="faq"
       className={`group border-b border-black/10 transition-colors duration-500 ${
         isOpen ? "bg-black/[0.02]" : "hover:bg-black/[0.01]"
       }`}

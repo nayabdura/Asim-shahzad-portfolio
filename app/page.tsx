@@ -1,54 +1,93 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
+// --- COMPONENT IMPORTS ---
 import Sidebar from "./components/Sidebar";
-// import MobileHeader from "./components/MobileHeader";
-// import MobileMenu from "./components/MobileMenu";
+import MobileHeader from "./components/MobileHeader";
+import MobileMenu from "./components/MobileMenu";
 import BlobBackground from "./components/BlobBackground";
 import MainSection from "./home/page";
-import Hero from "./who-am-i/page"; // Move your 'who-am-i' code to this component
+import Hero from "./who-am-i/page"; 
 import ExperienceSection from "./experience/page";
 import PartnersSection from "./components/PartnersSection";
 import Portfolio from "../app/portfolio/page";
 import TestimonialsSection from "./testimonials/page";
 import WhyUsSection from "./why-us/page";
 import FAQSection from "./faq/page";
-import ContactSection from "./contact/page";
-import './styles/home.css';
+import Contact from "./contact/page";
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("main");
+  
+  // Reference to the scrollable container
+  const scrollContainerRef = useRef<HTMLElement>(null);
 
-  // Smooth scroll function
+  // --- 1. SCROLL SPY LOGIC ---
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    // Select all direct children divs that have an ID (your sections)
+    // We target the sections inside the scroll container
+    const sections = container.querySelectorAll("div[id]");
+    
+    const observerOptions = {
+      root: container, // Watch scrolling specifically within this container
+      rootMargin: "0px",
+      threshold: 0.5, // Update sidebar when 50% of the section is visible
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // When a section comes into view, update the state
+          setActiveSection(entry.target.id);
+        }
+      });
+    }, observerOptions);
+
+    sections.forEach((section) => observer.observe(section));
+
+    return () => {
+      sections.forEach((section) => observer.unobserve(section));
+    };
+  }, []);
+
+  // --- 2. CLICK NAVIGATION ---
   const scrollToSection = (id: string) => {
+    setActiveSection(id); // Optimistically update the UI
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
-      setActiveSection(id);
     }
   };
 
   return (
-    <main className="relative flex h-screen w-full overflow-hidden bg-white font-sans">
+    <main className="relative flex h-screen w-full overflow-x-hidden bg-white font-sans">
       <BlobBackground />
 
-      {/* Sidebar - Passing state and scroll function */}
+      {/* Sidebar - Passing active state and scroll function */}
       <div className="hidden lg:flex shrink-0 z-50">
         <Sidebar activeSection={activeSection} onNavigate={scrollToSection} />
       </div>
 
-      {/* <MobileHeader onOpen={() => setIsMenuOpen(true)} /> */}
+      <MobileHeader onOpen={() => setIsMenuOpen(true)} />
 
-      {/* <AnimatePresence>
+      <AnimatePresence>
         {isMenuOpen && <MobileMenu onClose={() => setIsMenuOpen(false)} />}
-      </AnimatePresence> */}
+      </AnimatePresence>
 
       {/* MAIN SCROLLABLE AREA 
-          'scroll-smooth' handles the transition animation
+          1. Added ref={scrollContainerRef} so our observer knows what to watch
+          2. Kept your existing classes
       */}
-      <section className="relative flex-1 h-full overflow-y-auto scroll-smooth snap-y snap-mandatory">
+      <section 
+        ref={scrollContainerRef}
+        className="relative flex-1 h-full overflow-y-auto scroll-smooth snap-y snap-mandatory"
+      >
 
         {/* SECTION: Main */}
         <div
@@ -76,7 +115,7 @@ export default function LandingPage() {
           <ExperienceSection />
         </div>
 
-        {/* SECTION: Partners */}
+        {/* SECTION: Partners (What we do) */}
         <div id="what-we-do" className="min-h-screen flex items-center justify-center snap-start bg-transparent">
           <PartnersSection />
         </div>
@@ -101,9 +140,9 @@ export default function LandingPage() {
           <FAQSection />
         </div>
 
-          {/* SECTION: Contact-us */}
-        <div id="contact-us" className="min-h-screen flex items-center justify-center snap-start bg-transparent">
-          <ContactSection />
+        {/* SECTION: Contact-us */}
+        <div id="contact" className="min-h-screen flex items-center justify-center snap-start bg-transparent">
+          <Contact />
         </div>
       </section>
     </main>

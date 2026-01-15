@@ -19,7 +19,7 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ item }) => {
   const isExperience = item.type === 'experience';
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-[0_4px_20px_rgb(0,0,0,0.05)] flex h-full">
+    <div className="bg-transparent rounded-2xl p-6 shadow-[0_4px_20px_rgb(0,0,0,0.05)] flex h-full">
       {/* Left Column: Icon and Line */}
       <div className="flex flex-col items-center mr-5">
         {/* Icon Circle */}

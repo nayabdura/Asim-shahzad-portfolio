@@ -4,7 +4,7 @@ import asim from "../assets/asim.jpg";
 
 const Hero = () => {
   return (
-    <section className="relative w-full min-h-screen bg-white flex items-center justify-center px-6 py-12 md:px-16 lg:px-24">
+    <section id= "who-am-i" className="relative w-full min-h-screen bg-transparent flex items-center justify-center px-6 py-12 md:px-16 lg:px-24">
       <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
         {/* LEFT CONTENT */}
@@ -58,7 +58,7 @@ const Hero = () => {
         <div className="relative flex justify-center items-center">
           <div className="relative w-[350px] h-[350px] md:w-[450px] md:h-[450px] rounded-full p-[2px] bg-gradient-to-tr from-[#b14bf4] to-[#6d91fe]">
 
-            <div className="w-full h-full rounded-full bg-white flex items-end justify-center border-[12px] border-white">
+            <div className="w-full h-full rounded-full bg-transparent flex items-end justify-center border-[12px] border-white">
               <div className="relative w-full h-[110%] ">
                 <Image
                   src={asim}
@@ -66,7 +66,7 @@ const Hero = () => {
                   fill
                   priority
                   sizes="(max-width: 1000px) 500px, 800px"
-                  className="object-cover object-top    "
+                  className="object-cover object-top "
                 />
               </div>
             </div>

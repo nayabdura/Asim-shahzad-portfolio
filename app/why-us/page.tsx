@@ -86,7 +86,7 @@ const WhyUsSection = () => {
   const handlePrev = () => setActiveStep((prev) => (prev - 1 + STEPS.length) % STEPS.length);
 // ref={containerRef}
   return (
-    <section  className="py-10 min-h-screen font-sans">
+    <section id= "why-us" className="py-10 min-h-screen font-sans">
       <div className="max-w-6xl mx-auto px-6">
         
         {/* --- Header Section --- */}

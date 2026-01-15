@@ -28,7 +28,7 @@ interface SocialIconProps {
   color: string;
 }
 
-const ContactSection = () => {
+const Contact = () => {
   const [status, setStatus] = useState<"idle" | "sending" | "success">("idle");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -48,7 +48,7 @@ const ContactSection = () => {
   };
 
   return (
-    <section className="bg-transparent py-24 px-6 min-h-screen selection:bg-purple-100">
+    <section id= "contact" className="bg-transparent py-24 px-6 min-h-screen selection:bg-purple-100">
       <div className="max-w-7xl mx-auto">
         
         <div className="mb-20 text-center md:text-left">
@@ -229,4 +229,4 @@ const SocialIcon = ({ icon, link, color }: SocialIconProps) => (
   </motion.a>
 );
 
-export default ContactSection;
+export default Contact;

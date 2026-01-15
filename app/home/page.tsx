@@ -1,13 +1,14 @@
 "use client";
 
 import React from "react";
+import '../styles/home.css'; // Importing the CSS file for home styles
 
 const MainSection = () => {
 
   return (
-    <section className="home image" id="home">
+    <section className="home image " id="main">
       <div>
-        <div className="position-relative">
+        <div className="position-relative "> 
           <h1>
             <span>
               <span className="animated-layer">
@@ -16,8 +17,8 @@ const MainSection = () => {
             </span>
             <span className="position-relative">
               <span className="animated-layer">I am</span>
-              <span className="intro animated-layer">
-                Full-Stack Developer with 2 years experience based in Pakistan
+              <span className="intro animated-layer ">
+                Local SEO Expert & Link Builder with 3 years of experience, <br/> Based in Pakistan 🇵🇰
               </span>
             </span>
             <span>

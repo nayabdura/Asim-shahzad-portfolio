@@ -5,22 +5,53 @@ import { motion, useMotionValue, useSpring, animate } from "framer-motion";
 import { Star, Quote } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
-import Image from "next/image";
 
 if (typeof window !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
 }
 
+// Removed empty 'avatar' field, we generate it dynamically now
 const TESTIMONIALS = [
-    { id: 1, name: "Julian C", role: "SEO Manager", company: "conversioncow.com", content: "Asim is a strategic partner, not just a link builder. We saw a 40% increase in organic traffic within 3 months of his outreach campaign.", avatar: "" },
-    { id: 2, name: "Emmaree Lozada", role: "SEO Team Lead", company: "sortlist.com", content: "Finding a reliable white-label partner is hard, but Asim made it easy. His team handles our agency's entire link-building fulfillment.", avatar: "" },
-    { id: 3, name: "Tiago Caramuru", role: "Head of Marketing", company: "millionlabs.co.uk", content: "We needed high-authority trust signals for our Series B funding round. Asim delivered placements on top-tier publications.", avatar: "" },
-    { id: 4, name: "Andrei Tiburca", role: "Co-Founder", company: "videodeck.co", content: "I was skeptical about guest posting, but Asim proved its value. Our main product keywords moved from Page 3 to Top 3.", avatar: "" },
-    { id: 5, name: "Sarah Jenkins", role: "Product Lead", company: "techflow.io", content: "Most link builders write terrible content, but Asim is different. The articles his team writes are well-researched.", avatar: "" },
-    { id: 6, name: "Hina Malik", role: "SEO Director", company: "Global Tech Solutions", content: "We have strict vetting criteria for backlinks—no PBNs, no link farms. Asim passed our audit with flying colors.", avatar: "" },
+    { id: 1, name: "Julian C", role: "SEO Manager", company: "conversioncow.com", content: "Asim is a strategic partner, not just a link builder. We saw a 40% increase in organic traffic within 3 months of his outreach campaign." },
+    { id: 2, name: "Emmaree Lozada", role: "SEO Team Lead", company: "sortlist.com", content: "Finding a reliable white-label partner is hard, but Asim made it easy. His team handles our agency's entire link-building fulfillment." },
+    { id: 3, name: "Tiago Caramuru", role: "Head of Marketing", company: "millionlabs.co.uk", content: "We needed high-authority trust signals for our Series B funding round. Asim delivered placements on top-tier publications." },
+    { id: 4, name: "Andrei Tiburca", role: "Co-Founder", company: "videodeck.co", content: "I was skeptical about guest posting, but Asim proved its value. Our main product keywords moved from Page 3 to Top 3." },
+    { id: 5, name: "Sarah Jenkins", role: "Product Lead", company: "techflow.io", content: "Most link builders write terrible content, but Asim is different. The articles his team writes are well-researched." },
+    { id: 6, name: "Hina Malik", role: "SEO Director", company: "Global Tech Solutions", content: "We have strict vetting criteria for backlinks—no PBNs, no link farms. Asim passed our audit with flying colors." },
 ];
 
 const LOOP_DATA = [...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS];
+
+// --- CUSTOM AVATAR COMPONENT ---
+// Generates initials and a consistent background color based on the name
+const Avatar = ({ name, size = 56 }: { name: string; size?: number }) => {
+    const initials = name
+        .split(" ")
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase();
+
+    // Palette of nice muted colors that fit a professional theme
+    const colors = [
+        "bg-blue-500", "bg-emerald-500", "bg-violet-500", 
+        "bg-amber-500", "bg-rose-500", "bg-cyan-500", 
+        "bg-indigo-500", "bg-teal-500", "bg-fuchsia-500"
+    ];
+
+    // Simple hash function to get the same color for the same name every time
+    const charCodeSum = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const colorClass = colors[charCodeSum % colors.length];
+
+    return (
+        <div
+            className={`flex items-center justify-center rounded-full text-white font-bold shadow-sm border-2 border-white ${colorClass}`}
+            style={{ width: size, height: size, fontSize: size * 0.4 }}
+        >
+            {initials}
+        </div>
+    );
+};
 
 const TestimonialsSection = () => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -95,7 +126,7 @@ const TestimonialsSection = () => {
     }, [isPaused, x]);
 
     return (
-        <section
+        <section id="testimonials"
             ref={containerRef}
             className="relative py-24 bg-transparent overflow-hidden select-none"
             onMouseEnter={() => setIsPaused(true)}
@@ -132,7 +163,7 @@ const TestimonialsSection = () => {
                         />
                     </div>
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                      Clients Testimonials
+                        Clients Testimonials
                     </span>
                 </div>
             </div>
@@ -159,14 +190,9 @@ const TestimonialCard = ({ data }: { data: typeof TESTIMONIALS[0] }) => {
             </p>
 
             <div className="flex items-center gap-4 pt-8 border-t border-slate-50">
-                {/* Fixed Image Component */}
-                <Image
-                    src={data.avatar}
-                    alt={data.name}
-                    width={56} // Matches w-14 (14 * 4px)
-                    height={56} // Matches h-14
-                    className="rounded-full object-cover border-2 border-white shadow-sm"
-                />
+                {/* Replaced Next/Image with Custom Avatar Component */}
+                <Avatar name={data.name} />
+                
                 <div>
                     <h4 className="text-slate-900 font-bold text-lg leading-tight">{data.name}</h4>
                     <p className="text-slate-400 text-sm font-medium">
