@@ -133,7 +133,7 @@ const TestimonialsSection = () => {
             onMouseLeave={() => setIsPaused(false)}
         >
             <div className="max-w-[1440px] mx-auto px-6">
-                <div ref={headerRef} className="relative z-10 text-center mb-20 space-y-4">
+                <div  className="relative z-10 text-center mb-20 space-y-4">
                     <h2 className="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight">
                         Hear It Straight from <span className="text-[#582066]">Clients</span>
                     </h2>
