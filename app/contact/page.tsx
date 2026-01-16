@@ -2,13 +2,13 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Instagram, 
-  Facebook, 
-  Linkedin, 
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Instagram,
+  Facebook,
+  Linkedin,
   Send,
   CheckCircle2
 } from "lucide-react";
@@ -34,7 +34,7 @@ const Contact = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("sending");
-    
+
     const formData = new FormData(e.currentTarget);
     const response = await fetch("https://api.web3forms.com/submit", {
       method: "POST",
@@ -48,18 +48,18 @@ const Contact = () => {
   };
 
   return (
-    <section id= "contact" className="bg-transparent py-24 px-6 min-h-screen selection:bg-purple-100">
+    <section id="contact-us" className="bg-transparent py-24 px-6 min-h-screen selection:bg-purple-100">
       <div className="max-w-7xl mx-auto">
-        
+
         <div className="mb-20 text-center md:text-left">
-          <motion.span 
+          <motion.span
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             className="text-[#582066] font-bold tracking-widest text-sm uppercase block mb-4"
           >
             Get In Touch
           </motion.span>
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter leading-none"
@@ -70,26 +70,26 @@ const Contact = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-          
-          <motion.div 
+
+          <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             className="space-y-12"
           >
             <div className="space-y-8">
-              <ContactInfoItem 
+              <ContactInfoItem
                 icon={<Mail className="w-6 h-6" />}
                 title="Email Us"
                 content="asimseoweb@gmail.com"
                 link="mailto:asimseoweb@gmail.com"
               />
-              <ContactInfoItem 
+              <ContactInfoItem
                 icon={<Phone className="w-6 h-6" />}
-                title="Call Us"
-                content="+923135741451"
-                link="tel:+923135741451"
+                title="Chat on WhatsApp"
+                content="+92 313 5741451"
+                link="https://wa.me/923135741451"
               />
-              <ContactInfoItem 
+              <ContactInfoItem
                 icon={<MapPin className="w-6 h-6" />}
                 title="Visit Us"
                 content="Near Khadija Hospital, Faisalabad, Pakistan"
@@ -106,14 +106,14 @@ const Contact = () => {
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             className="bg-slate-50 p-8 md:p-12 rounded-[2.5rem] shadow-sm border border-slate-100 relative overflow-hidden"
           >
             <AnimatePresence mode="wait">
               {status === "success" ? (
-                <motion.div 
+                <motion.div
                   key="success"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -125,34 +125,34 @@ const Contact = () => {
                   <p className="text-slate-500">We&apos;ll get back to you within 24 hours.</p>
                 </motion.div>
               ) : (
-                <motion.form 
-                  key="form" 
-                  onSubmit={handleSubmit} 
+                <motion.form
+                  key="form"
+                  onSubmit={handleSubmit}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="space-y-6"
                 >
                   <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE" />
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700 ml-1">Full Name</label>
-                      <input 
-                        required 
+                      <input
+                        required
                         name="name"
-                        type="text" 
-                        placeholder="John Doe" 
+                        type="text"
+                        placeholder="John Doe"
                         className="w-full px-6 py-4 rounded-2xl bg-white border border-slate-200 focus:border-[#582066] outline-none transition-all"
                       />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700 ml-1">Email Address</label>
-                      <input 
-                        required 
+                      <input
+                        required
                         name="email"
-                        type="email" 
-                        placeholder="john@example.com" 
+                        type="email"
+                        placeholder="john@example.com"
                         className="w-full px-6 py-4 rounded-2xl bg-white border border-slate-200 focus:border-[#582066] outline-none transition-all"
                       />
                     </div>
@@ -160,27 +160,27 @@ const Contact = () => {
 
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-slate-700 ml-1">Phone Number</label>
-                    <input 
-                      required 
+                    <input
+                      required
                       name="phone"
-                      type="tel" 
-                      placeholder="+1 (555) 000-0000" 
+                      type="tel"
+                      placeholder="+1 (555) 000-0000"
                       className="w-full px-6 py-4 rounded-2xl bg-white border border-slate-200 focus:border-[#582066] outline-none transition-all"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-slate-700 ml-1">Your Message</label>
-                    <textarea 
-                      required 
+                    <textarea
+                      required
                       name="message"
-                      rows={5} 
-                      placeholder="How can we help you?" 
+                      rows={5}
+                      placeholder="How can we help you?"
                       className="w-full px-6 py-4 rounded-2xl bg-white border border-slate-200 focus:border-[#582066] outline-none transition-all resize-none"
                     ></textarea>
                   </div>
 
-                  <button 
+                  <button
                     type="submit"
                     disabled={status === "sending"}
                     className="w-full bg-[#582066] text-white font-bold py-5 rounded-2xl shadow-xl shadow-purple-900/20 hover:bg-[#43184d] transition-all flex items-center justify-center gap-3 disabled:opacity-70"
@@ -218,9 +218,9 @@ const ContactInfoItem = ({ icon, title, content, link }: ContactInfoProps) => (
 );
 
 const SocialIcon = ({ icon, link, color }: SocialIconProps) => (
-  <motion.a 
+  <motion.a
     whileHover={{ y: -5 }}
-    href={link} 
+    href={link}
     target="_blank"
     rel="noopener noreferrer"
     className={`w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 shadow-sm transition-all ${color}`}

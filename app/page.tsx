@@ -141,7 +141,7 @@ export default function LandingPage() {
         </div>
 
         {/* SECTION: Contact-us */}
-        <div id="contact" className="min-h-screen flex items-center justify-center snap-start bg-transparent">
+        <div id="contact-us" className="min-h-screen flex items-center justify-center snap-start bg-transparent">
           <Contact />
         </div>
       </section>

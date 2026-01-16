@@ -19,7 +19,7 @@ const navItems: NavItem[] = [
     { name: "Testimonials", id: "testimonials" },
     { name: "Why us?", id: "why-us" },
     { name: "Faq", id: "faq" },
-    { name: "Contact Us", id: "contact" },
+    { name: "Contact Us", id: "contact-us" },
 ];
 
 interface SidebarProps {
@@ -107,12 +107,12 @@ export default function Sidebar({ activeSection, onNavigate }: SidebarProps) {
                             <a href="https://www.instagram.com/backlinks.asim/" className="p-1.5 rounded-lg bg-white/10 hover:bg-cyan-500 transition-colors text-white">
                                 <Instagram size={14} />
                             </a>
-                            <a id="contact" className="p-1.5 rounded-lg bg-white/10 hover:bg-cyan-500 transition-colors text-white">
+                            <a id="contact-us" className="p-1.5 rounded-lg bg-white/10 hover:bg-cyan-500 transition-colors text-white">
                                 <Mail size={14} />
                             </a>
-                            <button onClick={() => onNavigate('contact')} className="ml-auto flex items-center gap-1 text-[10px] font-bold hover:text-cyan-400 transition-colors">
+                            <a href="mailto:asimseoweb@gmail.com" className="ml-auto flex items-center gap-1 text-[10px] font-bold hover:text-cyan-400 transition-colors">
                                 Book <ExternalLink size={10} />
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
