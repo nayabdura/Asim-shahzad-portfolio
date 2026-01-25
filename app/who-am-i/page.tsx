@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link"; // For better navigation performance
 import { ArrowUpRight, Monitor, Smartphone, Image as ImageIcon } from "lucide-react";
