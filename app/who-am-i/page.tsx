@@ -1,15 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link"; // For better navigation performance
+import Link from "next/link"; 
 import { ArrowUpRight, Monitor, Smartphone, Image as ImageIcon } from "lucide-react";
 import asim from "../assets/asim.jpg";
 
-// --- Data Arrays (To keep JSX clean) ---
+// --- Data Arrays ---
 const STATS = [
-  { value: "1200+", label: "Live Links Delivered" },
-  { value: "80+", label: "Projects Completed" },
-  { value: "100+", label: "Authority Sites (DA80+)" },
+  { value: "1200+", label: "Live Backlinks Delivered" }, // Keyword: Backlinks
+  { value: "80+", label: "Successful Projects" },
+  { value: "100+", label: "High DA Sites (DA80+)" }, // Keyword: High DA
 ];
 
 const FLOATING_ICONS = [
@@ -26,18 +26,20 @@ const Hero = () => {
         {/* LEFT CONTENT */}
         <div className="space-y-8">
           <div className="space-y-4">
+            {/* H1 OPTIMIZED FOR: High-DA Backlinks & Local SEO */}
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-[#1a1f2d] leading-[1.1]">
               Secure {" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#b14bf4] to-[#6d91fe]">
-                High-Authority
+                High-DA Backlinks
               </span>{" "}
-              Backlinks For
+              & Local SEO For
               <br />
               Real Growth
             </h1>
 
+            {/* DESCRIPTION OPTIMIZED FOR: Expert in Pakistan, Manual Outreach, White-Hat */}
             <p className="text-[#5e626f] text-lg md:text-xl max-w-md font-medium leading-relaxed">
-              Hi, I&apos;m Asim! With over 3 years of experience in SEO & Link Building, I am ready to help your brand dominate search results!
+              Hi, I&apos;m Asim! As a <strong>Top Local SEO Expert in Pakistan</strong>, I specialize in <strong>Manual Outreach</strong> & <strong>White-Hat Link Building</strong> to help your brand dominate Google search results!
             </p>
           </div>
 
@@ -50,7 +52,6 @@ const Hero = () => {
               Let&apos;s Connect
             </button>
 
-            {/* Changed Button to Link for SEO & Performance */}
             <Link 
               href="#portfolio"
               className="flex items-center gap-2 text-[#5e626f] font-bold text-lg hover:text-[#1a1f2d] transition-colors"
@@ -59,7 +60,7 @@ const Hero = () => {
             </Link>
           </div>
 
-          {/* STATS (Mapped for cleaner code) */}
+          {/* STATS */}
           <div className="flex gap-12 pt-8">
             {STATS.map((stat, index) => (
               <div key={index}>
@@ -78,16 +79,17 @@ const Hero = () => {
               <div className="relative w-full h-[110%]">
                 <Image
                   src={asim}
-                  alt="Asim SEO Profile" // Fixed Alt Text
+                  // ALT TAG OPTIMIZED FOR: Specific Professional Title + Location
+                  alt="Asim Shahzad - Best Local SEO Expert & Link Building Specialist in Pakistan" 
                   fill
-                  priority // Good for LCP
-                  sizes="(max-width: 768px) 350px, 450px" // Optimized sizes
+                  priority 
+                  sizes="(max-width: 768px) 350px, 450px" 
                   className="object-cover object-top"
                 />
               </div>
             </div>
 
-            {/* FLOATING ICONS (Mapped) */}
+            {/* FLOATING ICONS */}
             {FLOATING_ICONS.map(({ Icon, position }, index) => (
               <div 
                 key={index}
