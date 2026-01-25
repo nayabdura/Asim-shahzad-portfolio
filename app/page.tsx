@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { AnimatePresence } from "framer-motion";
 
 // --- COMPONENT IMPORTS ---
 import Sidebar from "./components/Sidebar";
 import MobileHeader from "./components/MobileHeader";
 import MobileMenu from "./components/MobileMenu";
 import BlobBackground from "./components/BlobBackground";
+
+// Importing Sections (Assumed these are optimized components)
 import MainSection from "./home/page";
 import Hero from "./who-am-i/page"; 
 import ExperienceSection from "./experience/page";
@@ -25,25 +27,23 @@ export default function LandingPage() {
   // Reference to the scrollable container
   const scrollContainerRef = useRef<HTMLElement>(null);
 
-  // --- 1. SCROLL SPY LOGIC ---
+  // --- 1. SCROLL SPY LOGIC (Optimized) ---
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    // Select all direct children divs that have an ID (your sections)
-    // We target the sections inside the scroll container
     const sections = container.querySelectorAll("div[id]");
     
+    // Performance: Thoda threshold adjust kiya taake jaldi detect ho
     const observerOptions = {
-      root: container, // Watch scrolling specifically within this container
-      rootMargin: "0px",
-      threshold: 0.5, // Update sidebar when 50% of the section is visible
+      root: container,
+      rootMargin: "-20% 0px -60% 0px", // Focus on the top-middle part of screen
+      threshold: 0, 
     };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          // When a section comes into view, update the state
           setActiveSection(entry.target.id);
         }
       });
@@ -53,56 +53,29 @@ export default function LandingPage() {
 
     return () => {
       sections.forEach((section) => observer.unobserve(section));
+      observer.disconnect();
     };
   }, []);
 
-  // --- 2. CLICK NAVIGATION ---
-  const scrollToSection = (id: string) => {
-    setActiveSection(id); // Optimistically update the UI
+  // --- 2. CLICK NAVIGATION (Memoized) ---
+  const scrollToSection = useCallback((id: string) => {
+    setActiveSection(id);
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
-  };
+  }, []);
 
-  return (
-    <main className="relative flex h-screen w-full overflow-x-hidden bg-white font-sans">
-      <BlobBackground />
-
-      {/* Sidebar - Passing active state and scroll function */}
-      <div className="hidden lg:flex shrink-0 z-50">
-        <Sidebar activeSection={activeSection} onNavigate={scrollToSection} />
-      </div>
-
-      <MobileHeader onOpen={() => setIsMenuOpen(true)} />
-
-      <AnimatePresence>
-        {isMenuOpen && <MobileMenu onClose={() => setIsMenuOpen(false)} />}
-      </AnimatePresence>
-
-      {/* MAIN SCROLLABLE AREA 
-          1. Added ref={scrollContainerRef} so our observer knows what to watch
-          2. Kept your existing classes
-      */}
-      <section 
-        ref={scrollContainerRef}
-        className="relative flex-1 h-full overflow-y-auto scroll-smooth snap-y snap-mandatory"
-      >
-
+  // --- 3. MEMOIZED SECTIONS (CRITICAL PERFORMANCE FIX) ---
+  // Iska faida: Jab 'activeSection' change hoga, to ye bhari bharkam sections 
+  // dobara re-render nahi honge. Sirf Sidebar update hoga.
+  const renderedSections = useMemo(() => (
+    <>
         {/* SECTION: Main */}
-        <div
-          id="main"
-          className="relative h-screen flex items-center justify-center p-6 snap-start bg-transparent"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false }}
-            transition={{ duration: 0.6 }}
-            className="w-full max-w-6xl flex justify-center"
-          >
+        <div id="main" className="relative h-screen flex items-center justify-center p-6 snap-start bg-transparent">
+          <div className="w-full max-w-6xl flex justify-center">
             <MainSection />
-          </motion.div>
+          </div>
         </div>
 
         {/* SECTION: Who am I? */}
@@ -115,7 +88,7 @@ export default function LandingPage() {
           <ExperienceSection />
         </div>
 
-        {/* SECTION: Partners (What we do) */}
+        {/* SECTION: Partners */}
         <div id="what-we-do" className="min-h-screen flex items-center justify-center snap-start bg-transparent">
           <PartnersSection />
         </div>
@@ -144,6 +117,32 @@ export default function LandingPage() {
         <div id="contact-us" className="min-h-screen flex items-center justify-center snap-start bg-transparent">
           <Contact />
         </div>
+    </>
+  ), []); // Empty dependency array = render once and stay static
+
+  return (
+    <main className="relative flex h-screen w-full overflow-hidden bg-white font-sans text-slate-900">
+      
+      {/* Optimized Background */}
+      <BlobBackground />
+
+      {/* Sidebar - Updates independently thanks to memoization above */}
+      <div className="hidden lg:flex shrink-0 z-50 h-full">
+        <Sidebar activeSection={activeSection} onNavigate={scrollToSection} />
+      </div>
+
+      <MobileHeader onOpen={() => setIsMenuOpen(true)} />
+
+      <AnimatePresence>
+        {isMenuOpen && <MobileMenu onClose={() => setIsMenuOpen(false)} />}
+      </AnimatePresence>
+
+      {/* MAIN SCROLLABLE AREA */}
+      <section 
+        ref={scrollContainerRef}
+        className="relative flex-1 h-full overflow-y-auto scroll-smooth snap-y snap-mandatory z-10"
+      >
+        {renderedSections}
       </section>
     </main>
   );

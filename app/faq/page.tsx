@@ -1,10 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 
-const FAQ_DATA = [
+// --- Types ---
+interface FAQItemData {
+  id: string;
+  question: string;
+  answer: string;
+  category: string;
+}
+
+// Data ko component se bahar rakha taake re-creation na ho
+const FAQ_DATA: FAQItemData[] = [
   {
     id: "01",
     question: "Why do I need to hire a link building agency?",
@@ -34,8 +43,13 @@ const FAQ_DATA = [
 const FAQSection = () => {
   const [activeId, setActiveId] = useState<string | null>("01");
 
+  // useCallback use kiya taake function reference bar bar change na ho
+  const handleToggle = useCallback((id: string) => {
+    setActiveId((prev) => (prev === id ? null : id));
+  }, []);
+
   return (
-    <section className="w-full  py-32 px-6 md:px-12 selection:bg-transparent/30">
+    <section id="faq" className="w-full py-32 px-6 md:px-12 selection:bg-cyan-100">
       <div className="max-w-[1400px] mx-auto">
         
         {/* --- Header Section --- */}
@@ -44,6 +58,7 @@ const FAQSection = () => {
             <motion.span 
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               className="text-[#2CCBFF] font-bold tracking-[0.3em] uppercase text-xs block mb-4"
             >
               Common Inquiries
@@ -51,10 +66,11 @@ const FAQSection = () => {
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               className="text-5xl md:text-7xl font-black text-black tracking-tighter"
             >
               Frequently Asked <br />
-              <span className="text-black bg-clip-text bg-gradient-to-r from-white to-slate-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-500">
                 Questions.
               </span>
             </motion.h2>
@@ -62,20 +78,25 @@ const FAQSection = () => {
           <motion.p 
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            className="text-slate-400 text-lg md:text-xl max-w-sm font-medium"
+            viewport={{ once: true }}
+            className="text-slate-500 text-lg md:text-xl max-w-sm font-medium"
           >
             Everything you need to know about our practical approach to growth.
           </motion.p>
         </div>
 
-        {/* --- FAQ List --- */}
-        <div className="border-t border-black/10">
+        {/* --- FAQ List (Schema.org Microdata added for SEO) --- */}
+        <div 
+          className="border-t border-black/10"
+          itemScope 
+          itemType="https://schema.org/FAQPage"
+        >
           {FAQ_DATA.map((faq) => (
             <FAQItem 
               key={faq.id} 
               faq={faq} 
               isOpen={activeId === faq.id} 
-              onClick={() => setActiveId(activeId === faq.id ? null : faq.id)}
+              onToggle={handleToggle}
             />
           ))}
         </div>
@@ -85,20 +106,32 @@ const FAQSection = () => {
   );
 };
 
-const FAQItem = ({ faq, isOpen, onClick }: { faq: any, isOpen: boolean, onClick: () => void }) => {
+// --- Memoized Child Component ---
+interface FAQItemProps {
+  faq: FAQItemData;
+  isOpen: boolean;
+  onToggle: (id: string) => void;
+}
+
+const FAQItem = memo(({ faq, isOpen, onToggle }: FAQItemProps) => {
   return (
-    <div  id="faq"
+    <div 
       className={`group border-b border-black/10 transition-colors duration-500 ${
         isOpen ? "bg-black/[0.02]" : "hover:bg-black/[0.01]"
       }`}
+      itemScope 
+      itemProp="mainEntity" 
+      itemType="https://schema.org/Question"
     >
       <button
-        onClick={onClick}
-        className="w-full py-10 md:py-14 flex items-start justify-between text-left px-4 md:px-8"
+        onClick={() => onToggle(faq.id)}
+        aria-expanded={isOpen}
+        aria-controls={`answer-${faq.id}`}
+        className="w-full py-10 md:py-14 flex items-start justify-between text-left px-4 md:px-8 cursor-pointer"
       >
         <div className="flex items-start gap-8 md:gap-16">
           <span className={`hidden md:block text-sm font-mono mt-2 transition-colors duration-500 ${
-            isOpen ? "text-black" : "text-slate-600"
+            isOpen ? "text-black" : "text-slate-400"
           }`}>
             {faq.id}
           </span>
@@ -106,16 +139,19 @@ const FAQItem = ({ faq, isOpen, onClick }: { faq: any, isOpen: boolean, onClick:
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black">
               {faq.category}
             </span>
-            <h3 className={`text-2xl md:text-4xl font-bold tracking-tight transition-all duration-500 ${
-              isOpen ? "text-black" : "text-slate-400 group-hover:text-slate-200"
-            }`}>
+            <h3 
+              itemProp="name"
+              className={`text-2xl md:text-4xl font-bold tracking-tight transition-all duration-500 ${
+                isOpen ? "text-black" : "text-slate-400 group-hover:text-slate-600"
+              }`}
+            >
               {faq.question}
             </h3>
           </div>
         </div>
 
-        <div className={`mt-2 p-2 rounded-full border transition-all duration-500 ${
-          isOpen ? "bg-[#2CCBFF] border-[#2CCBFF] text-[#0F172A] rotate-90" : "border-white/10 text-white"
+        <div className={`mt-2 p-2 rounded-full border transition-all duration-500 shrink-0 ${
+          isOpen ? "bg-[#2CCBFF] border-[#2CCBFF] text-[#0F172A] rotate-90" : "border-slate-200 text-slate-400"
         }`}>
           {isOpen ? <Minus size={24} /> : <Plus size={24} />}
         </div>
@@ -124,16 +160,22 @@ const FAQItem = ({ faq, isOpen, onClick }: { faq: any, isOpen: boolean, onClick:
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            id={`answer-${faq.id}`}
+            itemScope 
+            itemProp="acceptedAnswer" 
+            itemType="https://schema.org/Answer"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.5, ease: [0.04, 0.62, 0.23, 0.98] }}
+            className="overflow-hidden"
           >
             <div className="pb-14 md:pb-20 pl-4 md:pl-[120px] pr-4 md:pr-32">
               <motion.p 
+                itemProp="text"
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="text-slate-400 text-lg md:text-2xl leading-relaxed font-medium max-w-4xl"
+                className="text-slate-500 text-lg md:text-2xl leading-relaxed font-medium max-w-4xl"
               >
                 {faq.answer}
               </motion.p>
@@ -141,6 +183,7 @@ const FAQItem = ({ faq, isOpen, onClick }: { faq: any, isOpen: boolean, onClick:
               <motion.div 
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
                 className="h-px w-full bg-gradient-to-r from-[#2CCBFF]/50 to-transparent mt-12 origin-left"
               />
             </div>
@@ -149,6 +192,8 @@ const FAQItem = ({ faq, isOpen, onClick }: { faq: any, isOpen: boolean, onClick:
       </AnimatePresence>
     </div>
   );
-};
+});
+
+FAQItem.displayName = "FAQItem";
 
 export default FAQSection;

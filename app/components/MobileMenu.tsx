@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { X } from "lucide-react";
+
 
 
 const navItems = ["Main", "What we do?", "How we work?", "Jobs", "Sponsorship", "Why us?", "Contacts"];

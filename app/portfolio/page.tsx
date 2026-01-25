@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo, useMemo } from 'react';
 import { CheckCircle2, TrendingUp, ArrowRight, X, BarChart3, PieChart as PieIcon, LineChart as LineIcon } from 'lucide-react';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { PieChart } from '@mui/x-charts/PieChart';
 import Link from 'next/link';
 
-// --- 1. DEFINE INTERFACES ---
-// This tells TypeScript exactly what your data looks like
+// --- 1. TYPES & INTERFACES ---
 interface TrafficSource {
   id: number;
   value: number;
@@ -25,7 +24,8 @@ interface Study {
   trafficSources: TrafficSource[];
 }
 
-const studies: Study[] = [
+// --- 2. STATIC DATA (Moved outside component) ---
+const STUDIES_DATA: Study[] = [
   {
     id: 1,
     title: "How We Grew a Marketing Platform's Traffic 15% in 2 Months",
@@ -79,191 +79,198 @@ const studies: Study[] = [
   }
 ];
 
+// --- 3. MAIN COMPONENT ---
 const CaseStudies = () => {
-  // --- 2. FIX STATE TYPING ---
-  // Using the generic <Study | null> fixes the "not assignable to null" and "property does not exist" errors
   const [selectedStudy, setSelectedStudy] = useState<Study | null>(null);
 
-  const handleClose = () => setSelectedStudy(null);
+  // Handlers memoized to prevent re-renders of child components
+  const handleOpen = useCallback((study: Study) => setSelectedStudy(study), []);
+  const handleClose = useCallback(() => setSelectedStudy(null), []);
 
   return (
-    <div id= "portfolio" className="max-w-7xl mx-auto px-6 py-12 relative">
+    <div id="portfolio" className="max-w-7xl mx-auto px-6 py-12 relative">
+      
+      {/* Global SVG Definition for Gradients (Define once, use everywhere) */}
+      <svg width={0} height={0}>
+        <defs>
+          <linearGradient id="cyanGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
+            <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id="cyanGradientModal" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
+            <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+      </svg>
+
       <h2 className="text-center text-4xl font-extrabold text-gray-900 mb-16">
         Featured <span className="text-cyan-500">Case Studies</span>
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {studies.map((study) => (
-          <div
-            key={study.id}
-            className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] hover:shadow-xl transition-all duration-500 group flex flex-col"
-          >
-            <div className="flex justify-between items-center mb-8">
-              <div className="flex items-center gap-2 text-cyan-600 font-bold text-sm bg-cyan-50 px-4 py-1.5 rounded-full">
-                <CheckCircle2 size={16} /> {study.traffic}
-              </div>
-              <div className="flex items-center gap-2 text-cyan-600 font-bold text-sm bg-cyan-50 px-4 py-1.5 rounded-full">
-                <TrendingUp size={16} /> {study.dr}
-              </div>
-            </div>
-
-            {/* --- 3. FIX CHART PROPS --- 
-                Removed leftAxis={null} and bottomAxis={null}.
-                Moved visibility control to xAxis and yAxis props.
-            */}
-            <div className="relative w-full h-64 mb-8 bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 p-2 cursor-pointer" onClick={() => setSelectedStudy(study)}>
-              <LineChart
-                series={[{ data: study.chartData, area: true, showMark: false, color: '#06b6d4' }]}
-                // Hide X Axis via config
-                xAxis={[{
-                  data: [1, 2, 3, 4, 5, 6, 7, 8],
-                  scaleType: 'point',
-                  disableTicks: true,
-                  disableLine: true
-                }]}
-                // Hide Y Axis via config
-                yAxis={[{
-                  disableTicks: true,
-                  disableLine: true
-                }]}
-                grid={{ horizontal: false, vertical: false }}
-                margin={{ top: 20, bottom: 0, left: 0, right: 0 }}
-                sx={{ '.MuiAreaElement-root': { fill: "url('#cyanGradient')", opacity: 0.3 } }}
-              >
-                <defs>
-                  <linearGradient id="cyanGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-              </LineChart>
-            </div>
-
-            <h3 className="text-gray-900 text-2xl font-extrabold mb-6 leading-tight group-hover:text-cyan-600 transition-colors">
-              {study.title}
-            </h3>
-
-            <button
-              onClick={() => setSelectedStudy(study)}
-              className="flex items-center gap-2 text-gray-900 font-bold text-sm group-hover:gap-4 transition-all mt-auto outline-none"
-            >
-              Read More <ArrowRight size={18} className="text-cyan-500" />
-            </button>
-          </div>
+        {STUDIES_DATA.map((study) => (
+          <StudyCard key={study.id} study={study} onSelect={handleOpen} />
         ))}
       </div>
 
+      {/* Modal is strictly separated */}
       {selectedStudy && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
-            onClick={handleClose}
-          ></div>
-
-          <div className="bg-white rounded-[32px] w-full max-w-5xl max-h-[90vh] overflow-y-auto z-10 shadow-2xl animate-in fade-in zoom-in duration-200">
-
-            <div className="sticky top-0 bg-white/90 backdrop-blur-md p-8 border-b border-gray-100 flex justify-between items-start z-20">
-              <div>
-                <h3 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">
-                  {selectedStudy.title}
-                </h3>
-                <div className="flex gap-4">
-                  <span className="text-cyan-600 font-semibold bg-cyan-50 px-3 py-1 rounded-full text-sm">
-                    {selectedStudy.traffic}
-                  </span>
-                  <span className="text-gray-500 font-semibold bg-gray-100 px-3 py-1 rounded-full text-sm">
-                    {selectedStudy.dr}
-                  </span>
-                </div>
-              </div>
-              <button onClick={handleClose} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
-                <X size={24} className="text-gray-600" />
-              </button>
-            </div>
-
-            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50/50">
-
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 md:col-span-2">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="p-2 bg-cyan-100 rounded-lg text-cyan-600"><LineIcon size={20} /></div>
-                  <h4 className="font-bold text-gray-800">Traffic Growth Trajectory</h4>
-                </div>
-                <div className="h-[300px] w-full">
-                  <LineChart
-                    series={[{ data: selectedStudy.chartData, area: true, color: '#06b6d4', label: 'Visitors' }]}
-                    xAxis={[{ data: [1, 2, 3, 4, 5, 6, 7, 8], scaleType: 'point' }]}
-                    grid={{ horizontal: true }}
-                    sx={{ '.MuiAreaElement-root': { fill: "url('#cyanGradientModal')", opacity: 0.2 } }}
-                  >
-                    <defs>
-                      <linearGradient id="cyanGradientModal" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                  </LineChart>
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="p-2 bg-purple-100 rounded-lg text-purple-600"><BarChart3 size={20} /></div>
-                  <h4 className="font-bold text-gray-800">Monthly Leads Generated</h4>
-                </div>
-                <div className="h-[250px] w-full">
-                  <BarChart
-                    series={[{ data: selectedStudy.monthlyLeads, color: '#8b5cf6', label: 'Leads' }]}
-                    xAxis={[{ scaleType: 'band', data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'] }]}
-                    borderRadius={8}
-                  />
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="p-2 bg-orange-100 rounded-lg text-orange-600"><PieIcon size={20} /></div>
-                  <h4 className="font-bold text-gray-800">Traffic Source Breakdown</h4>
-                </div>
-                <div className="h-[250px] w-full flex items-center justify-center">
-                  <PieChart
-                    series={[
-                      {
-                        data: selectedStudy.trafficSources,
-                        innerRadius: 30,
-                        outerRadius: 100,
-                        paddingAngle: 5,
-                        cornerRadius: 5,
-                      },
-                    ]}
-                    // --- 4. FIX LEGEND TYPE ---
-                    // Using sx to hide the legend is safer than 'hidden: true' which sometimes triggers type errors on older versions
-                    sx={{
-                      "& .MuiChartsLegend-root": {
-                        display: "none !important"
-                      }
-                    }}
-                  />
-                </div>
-              </div>
-
-            </div>
-
-            {/* Modal Footer Call to Action */}
-            <div className="p-8 bg-white border-t border-gray-100 text-center">
-              <p className="text-gray-500 mb-4">Want results like these?</p>
-
-              <Link
-                href="/contact"
-                className="inline-block bg-gray-900 text-white px-8 py-3 rounded-full font-bold hover:bg-cyan-600 transition-colors"
-              >
-                Start Your Project
-              </Link>
-            </div>
-          </div>
-        </div>
+        <StudyModal study={selectedStudy} onClose={handleClose} />
       )}
     </div>
   );
 };
+
+// --- 4. MEMOIZED SUB-COMPONENTS ---
+
+// A. Study Card Component (Optimized for List View)
+const StudyCard = memo(({ study, onSelect }: { study: Study; onSelect: (s: Study) => void }) => {
+  return (
+    <div className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] hover:shadow-xl transition-all duration-500 group flex flex-col">
+      <div className="flex justify-between items-center mb-8">
+        <Badge icon={CheckCircle2} text={study.traffic} />
+        <Badge icon={TrendingUp} text={study.dr} />
+      </div>
+
+      <div 
+        className="relative w-full h-64 mb-8 bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 p-2 cursor-pointer" 
+        onClick={() => onSelect(study)}
+      >
+        {/* Simplified Chart for Preview: No tooltips, no axis listeners for performance */}
+        <LineChart
+          series={[{ data: study.chartData, area: true, showMark: false, color: '#06b6d4' }]}
+          xAxis={[{ data: [1, 2, 3, 4, 5, 6, 7, 8], scaleType: 'point', disableTicks: true, disableLine: true }]}
+          yAxis={[{ disableTicks: true, disableLine: true }]}
+          grid={{ horizontal: false, vertical: false }}
+          margin={{ top: 20, bottom: 0, left: 0, right: 0 }}
+          sx={{ 
+            '.MuiAreaElement-root': { fill: "url('#cyanGradient')", opacity: 0.3 },
+            pointerEvents: 'none' // Important: Disables heavy hover calculations in list view
+          }}
+        />
+      </div>
+
+      <h3 className="text-gray-900 text-2xl font-extrabold mb-6 leading-tight group-hover:text-cyan-600 transition-colors">
+        {study.title}
+      </h3>
+
+      <button
+        onClick={() => onSelect(study)}
+        className="flex items-center gap-2 text-gray-900 font-bold text-sm group-hover:gap-4 transition-all mt-auto outline-none"
+      >
+        Read More <ArrowRight size={18} className="text-cyan-500" />
+      </button>
+    </div>
+  );
+});
+
+// B. Modal Component (Isolated Heavy Rendering)
+const StudyModal = memo(({ study, onClose }: { study: Study; onClose: () => void }) => {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm animate-in fade-in duration-200"
+        onClick={onClose}
+      ></div>
+
+      <div className="bg-white rounded-[32px] w-full max-w-5xl max-h-[90vh] overflow-y-auto z-10 shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col">
+        
+        {/* Header */}
+        <div className="sticky top-0 bg-white/95 backdrop-blur-md p-6 md:p-8 border-b border-gray-100 flex justify-between items-start z-20">
+          <div>
+            <h3 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-3">
+              {study.title}
+            </h3>
+            <div className="flex gap-4">
+              <Badge icon={CheckCircle2} text={study.traffic} />
+              <Badge icon={TrendingUp} text={study.dr} variant="gray" />
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+            <X size={24} className="text-gray-600" />
+          </button>
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50/50">
+          
+          {/* Main Chart */}
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 md:col-span-2">
+            <ChartHeader icon={LineIcon} color="text-cyan-600" bg="bg-cyan-100" title="Traffic Growth Trajectory" />
+            <div className="h-[300px] w-full">
+              <LineChart
+                series={[{ data: study.chartData, area: true, color: '#06b6d4', label: 'Visitors' }]}
+                xAxis={[{ data: [1, 2, 3, 4, 5, 6, 7, 8], scaleType: 'point' }]}
+                grid={{ horizontal: true }}
+                sx={{ '.MuiAreaElement-root': { fill: "url('#cyanGradientModal')", opacity: 0.2 } }}
+              />
+            </div>
+          </div>
+
+          {/* Bar Chart */}
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+            <ChartHeader icon={BarChart3} color="text-purple-600" bg="bg-purple-100" title="Monthly Leads Generated" />
+            <div className="h-[250px] w-full">
+              <BarChart
+                series={[{ data: study.monthlyLeads, color: '#8b5cf6', label: 'Leads' }]}
+                xAxis={[{ scaleType: 'band', data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'] }]}
+                borderRadius={8}
+              />
+            </div>
+          </div>
+
+          {/* Pie Chart */}
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+            <ChartHeader icon={PieIcon} color="text-orange-600" bg="bg-orange-100" title="Traffic Source Breakdown" />
+            <div className="h-[250px] w-full flex items-center justify-center">
+              <PieChart
+                series={[{
+                  data: study.trafficSources,
+                  innerRadius: 30,
+                  outerRadius: 100,
+                  paddingAngle: 5,
+                  cornerRadius: 5,
+                }]}
+                sx={{ "& .MuiChartsLegend-root": { display: "none !important" } }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-8 bg-white border-t border-gray-100 text-center mt-auto">
+          <p className="text-gray-500 mb-4">Want results like these?</p>
+          <Link
+            href="/contact"
+            className="inline-block bg-gray-900 text-white px-8 py-3 rounded-full font-bold hover:bg-cyan-600 transition-colors"
+          >
+            Start Your Project
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+// --- Helper UI Components (Reusable) ---
+
+const Badge = ({ icon: Icon, text, variant = 'cyan' }: { icon: any, text: string, variant?: 'cyan' | 'gray' }) => (
+  <div className={`flex items-center gap-2 font-bold text-sm px-4 py-1.5 rounded-full ${
+    variant === 'cyan' ? 'text-cyan-600 bg-cyan-50' : 'text-gray-500 bg-gray-100'
+  }`}>
+    <Icon size={16} /> {text}
+  </div>
+);
+
+const ChartHeader = ({ icon: Icon, color, bg, title }: { icon: any, color: string, bg: string, title: string }) => (
+  <div className="flex items-center gap-2 mb-6">
+    <div className={`p-2 rounded-lg ${bg} ${color}`}><Icon size={20} /></div>
+    <h4 className="font-bold text-gray-800">{title}</h4>
+  </div>
+);
+
+StudyCard.displayName = "StudyCard";
+StudyModal.displayName = "StudyModal";
 
 export default CaseStudies;

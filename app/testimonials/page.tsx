@@ -1,207 +1,169 @@
 "use client";
 
-import React, { useRef, useState, useEffect, useCallback } from "react";
-import { motion, useMotionValue, useSpring, animate } from "framer-motion";
+import React, { useRef, useState, useEffect, memo } from "react";
+import { 
+  motion, 
+  useMotionValue, 
+  animate, 
+  useMotionValueEvent,
+  PanInfo 
+} from "framer-motion";
 import { Star, Quote } from "lucide-react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 
-if (typeof window !== "undefined") {
-    gsap.registerPlugin(ScrollTrigger);
+// --- Types ---
+interface Testimonial {
+  id: number;
+  name: string;
+  role: string;
+  company: string;
+  content: string;
+  color: string;
 }
 
-// Removed empty 'avatar' field, we generate it dynamically now
-const TESTIMONIALS = [
-    { id: 1, name: "Julian C", role: "SEO Manager", company: "conversioncow.com", content: "Asim is a strategic partner, not just a link builder. We saw a 40% increase in organic traffic within 3 months of his outreach campaign." },
-    { id: 2, name: "Emmaree Lozada", role: "SEO Team Lead", company: "sortlist.com", content: "Finding a reliable white-label partner is hard, but Asim made it easy. His team handles our agency's entire link-building fulfillment." },
-    { id: 3, name: "Tiago Caramuru", role: "Head of Marketing", company: "millionlabs.co.uk", content: "We needed high-authority trust signals for our Series B funding round. Asim delivered placements on top-tier publications." },
-    { id: 4, name: "Andrei Tiburca", role: "Co-Founder", company: "videodeck.co", content: "I was skeptical about guest posting, but Asim proved its value. Our main product keywords moved from Page 3 to Top 3." },
-    { id: 5, name: "Sarah Jenkins", role: "Product Lead", company: "techflow.io", content: "Most link builders write terrible content, but Asim is different. The articles his team writes are well-researched." },
-    { id: 6, name: "Hina Malik", role: "SEO Director", company: "Global Tech Solutions", content: "We have strict vetting criteria for backlinks—no PBNs, no link farms. Asim passed our audit with flying colors." },
+const COLORS = ["bg-blue-500", "bg-emerald-500", "bg-violet-500", "bg-amber-500", "bg-rose-500", "bg-cyan-500", "bg-indigo-500"];
+
+const TESTIMONIALS: Testimonial[] = [
+  { id: 1, name: "Julian C", role: "SEO Manager", company: "conversioncow.com", content: "Asim is a strategic partner. We saw a 40% increase in organic traffic within 3 months.", color: COLORS[0] },
+  { id: 2, name: "Emmaree Lozada", role: "SEO Team Lead", company: "sortlist.com", content: "Finding a reliable white-label partner is hard, but Asim made it easy. Reliable fulfillment.", color: COLORS[1] },
+  { id: 3, name: "Tiago Caramuru", role: "Head of Marketing", company: "millionlabs.co.uk", content: "We needed high-authority trust signals for our Series B funding. Asim delivered top-tier placements.", color: COLORS[2] },
+  { id: 4, name: "Andrei Tiburca", role: "Co-Founder", company: "videodeck.co", content: "Skeptical at first, but Asim proved value. Main keywords moved from Page 3 to Top 3.", color: COLORS[3] },
+  { id: 5, name: "Sarah Jenkins", role: "Product Lead", company: "techflow.io", content: "Most link builders write terrible content, but Asim is different. Well-researched articles.", color: COLORS[4] },
+  { id: 6, name: "Hina Malik", role: "SEO Director", company: "Global Tech", content: "Strict vetting criteria—no PBNs, no link farms. Asim passed our audit perfectly.", color: COLORS[5] },
 ];
 
-const LOOP_DATA = [...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS];
+// --- Memoized Sub-Components ---
 
-// --- CUSTOM AVATAR COMPONENT ---
-// Generates initials and a consistent background color based on the name
-const Avatar = ({ name, size = 56 }: { name: string; size?: number }) => {
-    const initials = name
-        .split(" ")
-        .map((n) => n[0])
-        .slice(0, 2)
-        .join("")
-        .toUpperCase();
+const Avatar = memo(({ name, color }: { name: string; color: string }) => (
+  <div className={`w-10 h-10 flex items-center justify-center rounded-full text-white font-bold text-xs shadow-sm border-2 border-white flex-shrink-0 ${color}`}>
+    {name.substring(0, 2).toUpperCase()}
+  </div>
+));
+Avatar.displayName = "Avatar";
 
-    // Palette of nice muted colors that fit a professional theme
-    const colors = [
-        "bg-blue-500", "bg-emerald-500", "bg-violet-500", 
-        "bg-amber-500", "bg-rose-500", "bg-cyan-500", 
-        "bg-indigo-500", "bg-teal-500", "bg-fuchsia-500"
-    ];
-
-    // Simple hash function to get the same color for the same name every time
-    const charCodeSum = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const colorClass = colors[charCodeSum % colors.length];
-
-    return (
-        <div
-            className={`flex items-center justify-center rounded-full text-white font-bold shadow-sm border-2 border-white ${colorClass}`}
-            style={{ width: size, height: size, fontSize: size * 0.4 }}
-        >
-            {initials}
+const TestimonialCard = memo(({ data }: { data: Testimonial }) => {
+  return (
+    // FIX: Fixed width (w-[...]) instead of min-width to keep them boxy
+    <div className="w-[280px] md:w-[350px] bg-white border border-slate-100 rounded-3xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex flex-col group hover:shadow-lg hover:-translate-y-1 transition-all duration-300 select-none flex-shrink-0">
+      
+      {/* Header with Stars */}
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex text-[#FFB800]">
+          {[1,2,3,4,5].map(i => <Star key={i} size={14} fill="currentColor" />)}
         </div>
-    );
-};
+        <Quote size={24} className="text-[#582066] opacity-20" />
+      </div>
+
+      {/* Content Area */}
+      <p className="text-slate-600 text-[15px] leading-relaxed mb-6 flex-grow">
+        &quot;{data.content}&quot;
+      </p>
+
+      {/* User Info */}
+      <div className="flex items-center gap-3 pt-4 border-t border-slate-50 mt-auto">
+        <Avatar name={data.name} color={data.color} />
+        <div className="overflow-hidden">
+          <h4 className="text-slate-900 font-bold text-sm truncate">{data.name}</h4>
+          <p className="text-slate-400 text-xs font-medium truncate">
+            {data.role} @ <span className="text-[#582066]">{data.company}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+});
+TestimonialCard.displayName = "TestimonialCard";
+
+// --- Main Section ---
 
 const TestimonialsSection = () => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const sliderRef = useRef<HTMLDivElement>(null);
-    const headerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
+  const x = useMotionValue(0);
+  
+  // Create enough duplicates to ensure smooth looping
+  const LOOP_DATA = React.useMemo(() => [...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS, ...TESTIMONIALS], []);
 
-    const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0 });
-    const [isPaused, setIsPaused] = useState(false);
-    const x = useMotionValue(0);
-    const scrollProgress = useSpring(0, { stiffness: 100, damping: 30 });
+  useEffect(() => {
+    let controls: any;
+    const speed = 35; // Thoda slow kiya taake users parh sakein
 
-    const updateConstraints = useCallback(() => {
-        if (sliderRef.current && containerRef.current) {
-            const cardWidth = sliderRef.current.scrollWidth / 3;
-            const visibleWidth = containerRef.current.offsetWidth;
-            setDragConstraints({
-                left: -(cardWidth * 2 - visibleWidth),
-                right: -cardWidth
-            });
-            x.set(-cardWidth);
-        }
-    }, [x]);
+    const startAnimation = () => {
+      if (isPaused) return;
+      controls = animate(x, x.get() - speed, {
+        ease: "linear",
+        duration: 1,
+        onComplete: startAnimation
+      });
+    };
 
-    useEffect(() => {
-        updateConstraints();
-        window.addEventListener("resize", updateConstraints);
+    startAnimation();
+    return () => controls?.stop();
+  }, [isPaused, x]);
 
-        const ctx = gsap.context(() => {
-            gsap.from(headerRef.current, {
-                y: 60,
-                opacity: 0,
-                duration: 1,
-                ease: "power4.out",
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: "top 80%",
-                }
-            });
-        }, containerRef);
+  // Seamless Loop Reset Logic (Updated for new Width)
+  useMotionValueEvent(x, "change", (latest) => {
+     // Width Calculation:
+     // Desktop: 350px width + 24px gap = 374px
+     // Mobile logic is handled by ensuring we have enough buffer, but let's base it on larger width to be safe.
+     const itemWidth = 350 + 24; 
+     const totalWidth = itemWidth * TESTIMONIALS.length;
+     
+     if (latest <= -totalWidth) {
+       x.set(0);
+     }
+  });
 
-        return () => {
-            window.removeEventListener("resize", updateConstraints);
-            ctx.revert();
-        };
-    }, [updateConstraints]);
+  const handleDragEnd = (_: any, info: PanInfo) => {
+    setIsPaused(false);
+  };
 
-    useEffect(() => {
-        const unsubscribe = x.on("change", (latest) => {
-            if (sliderRef.current) {
-                const cardWidth = sliderRef.current.scrollWidth / 3;
-                if (latest <= -(cardWidth * 2)) x.set(latest + cardWidth);
-                if (latest >= -cardWidth + 100) x.set(latest - cardWidth);
-                const relativeX = Math.abs(latest + cardWidth);
-                const progress = Math.min(Math.max(relativeX / cardWidth, 0), 1);
-                scrollProgress.set(progress);
-            }
-        });
-        return () => unsubscribe();
-    }, [x, scrollProgress]);
-
-    useEffect(() => {
-        if (isPaused) return;
-        const interval = setInterval(() => {
-            animate(x, x.get() - 400, {
-                type: "spring",
-                stiffness: 40,
-                damping: 20,
-                restDelta: 0.5
-            });
-        }, 4500);
-        return () => clearInterval(interval);
-    }, [isPaused, x]);
-
-    return (
-        <section id="testimonials"
-            ref={containerRef}
-            className="relative py-24 bg-transparent overflow-hidden select-none"
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
+  return (
+    <section id="testimonials" className="relative py-20 bg-transparent overflow-hidden">
+      <div className="max-w-[1440px] mx-auto px-6">
+        
+        {/* Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16 space-y-3"
         >
-            <div className="max-w-[1440px] mx-auto px-6">
-                <div ref={headerRef} className="relative z-10 text-center mb-20 space-y-4">
-                    <h2 className="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight">
-                        Hear It Straight from <span className="text-[#582066]">Clients</span>
-                    </h2>
-                    <p className="text-slate-500 text-lg md:text-xl font-medium max-w-2xl mx-auto">
-                        Real feedback from clients who’ve seen results.
-                    </p>
-                </div>
-                <div className="relative cursor-grab active:cursor-grabbing">
-                    <motion.div
-                        ref={sliderRef}
-                        drag="x"
-                        dragConstraints={dragConstraints}
-                        onDragStart={() => setIsPaused(true)}
-                        style={{ x }}
-                        className="flex gap-6 md:gap-8 items-stretch"
-                    >
-                        {LOOP_DATA.map((item, idx) => (
-                            <TestimonialCard key={`${item.id}-${idx}`} data={item} />
-                        ))}
-                    </motion.div>
-                </div>
-                <div className="mt-16 flex flex-col items-center gap-4">
-                    <div className="w-64 h-1.5 bg-slate-100 rounded-full overflow-hidden relative">
-                        <motion.div
-                            style={{ scaleX: scrollProgress, transformOrigin: "left" }}
-                            className="absolute inset-0 bg-[#582066]"
-                        />
-                    </div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                        Clients Testimonials
-                    </span>
-                </div>
-            </div>
-        </section>
-    );
-};
-
-const TestimonialCard = ({ data }: { data: typeof TESTIMONIALS[0] }) => {
-    return (
-        <motion.div
-            className="min-w-[300px] md:min-w-[450px] bg-white border border-slate-100 rounded-[2.5rem] p-8 md:p-10 shadow-sm hover:shadow-2xl hover:shadow-purple-900/5 transition-all duration-500 flex flex-col"
-        >
-            <div className="flex justify-between items-start mb-8">
-                <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={18} fill="#FFB800" className="text-[#FFB800]" />
-                    ))}
-                </div>
-                <Quote size={40} className="text-[#582066] opacity-10" />
-            </div>
-
-            <p className="text-slate-600 text-lg leading-relaxed mb-10 flex-grow">
-                &quot;{data.content}&quot;
-            </p>
-
-            <div className="flex items-center gap-4 pt-8 border-t border-slate-50">
-                {/* Replaced Next/Image with Custom Avatar Component */}
-                <Avatar name={data.name} />
-                
-                <div>
-                    <h4 className="text-slate-900 font-bold text-lg leading-tight">{data.name}</h4>
-                    <p className="text-slate-400 text-sm font-medium">
-                        {data.role} @ <span className="text-[#582066]">{data.company}</span>
-                    </p>
-                </div>
-            </div>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900">
+            Client <span className="text-[#582066]">Feedback</span>
+          </h2>
+          <p className="text-slate-500 text-base md:text-lg max-w-xl mx-auto">
+            Trusted by SaaS founders and Agencies worldwide.
+          </p>
         </motion.div>
-    );
+
+        {/* Slider Area */}
+        <div 
+          className="relative -mx-6 md:mx-0" // Mobile mein edge-to-edge karne ke liye
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          {/* Gradients for fade effect on edges */}
+          <div className="absolute left-0 top-0 bottom-0 w-8 md:w-32 bg-gradient-to-r from-[#f9f9fa] to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-8 md:w-32 bg-gradient-to-l from-[#f9f9fa] to-transparent z-10 pointer-events-none" />
+
+          <motion.div
+            ref={containerRef}
+            style={{ x }}
+            drag="x"
+            dragConstraints={{ left: -10000, right: 0 }}
+            onDragStart={() => setIsPaused(true)}
+            onDragEnd={handleDragEnd}
+            className="flex gap-6 pl-6 md:pl-0 w-max cursor-grab active:cursor-grabbing py-4"
+          >
+            {LOOP_DATA.map((item, idx) => (
+              <TestimonialCard key={`${item.id}-${idx}`} data={item} />
+            ))}
+          </motion.div>
+        </div>
+
+      </div>
+    </section>
+  );
 };
 
-export default TestimonialsSection;
+export default memo(TestimonialsSection);
