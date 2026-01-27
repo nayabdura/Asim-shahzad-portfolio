@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useCallback, memo } from "react";
+import React, { useState, useCallback, memo, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import emailjs from "@emailjs/browser";
 import {
   Mail,
   Phone,
@@ -10,7 +11,8 @@ import {
   Facebook,
   Linkedin,
   Send,
-  CheckCircle2
+  CheckCircle2,
+  AlertCircle
 } from "lucide-react";
 
 // --- Types ---
@@ -28,7 +30,6 @@ interface SocialIconProps {
 }
 
 // --- Memoized Helper Components ---
-
 const ContactInfoItem = memo(({ icon: Icon, title, content, link }: ContactInfoProps) => (
   <div className="flex items-start gap-6 group">
     <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-[#582066] group-hover:bg-[#582066] group-hover:text-white transition-all duration-300 shadow-sm">
@@ -62,7 +63,6 @@ const SocialIcon = memo(({ Icon, link, color }: SocialIconProps) => (
 ));
 SocialIcon.displayName = "SocialIcon";
 
-// --- Animation Variants ---
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { 
@@ -77,33 +77,67 @@ const itemVariants = {
 };
 
 const Contact = () => {
-  const [status, setStatus] = useState<"idle" | "sending" | "success">("idle");
+  const formRef = useRef<HTMLFormElement>(null);
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Initialize EmailJS using env variable
+  useEffect(() => {
+    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+    if (publicKey) {
+      emailjs.init(publicKey);
+    }
+  }, []);
 
   const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    const currentForm = e.currentTarget;
+    const formData = new FormData(currentForm);
+    
+    const email = (formData.get("user_email") as string || "").trim();
+    const phone = (formData.get("phone") as string || "").trim();
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const phoneRegex = /^((\+92)|(92)|(0))?3[0-9]{9}$/;
+
+    if (!emailRegex.test(email)) {
+      setErrorMessage("Please enter a valid email address.");
+      return;
+    }
+    
+    if (!phoneRegex.test(phone)) {
+      setErrorMessage("Please enter a valid Pakistani phone number.");
+      return;
+    }
+
+    setErrorMessage("");
     setStatus("sending");
 
     try {
-      const formData = new FormData(e.currentTarget);
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        body: formData
-      });
+      const response = await emailjs.sendForm(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
+        currentForm,
+        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
+      );
 
-      if (response.ok) {
+      if (response.status === 200) {
         setStatus("success");
+        currentForm.reset();
         setTimeout(() => setStatus("idle"), 5000);
       }
-    } catch (error) {
-      console.error("Form submission error", error);
-      setStatus("idle");
+    } catch (error: any) {
+      console.error("EmailJS Error:", error);
+      setErrorMessage(error?.text || "Something went wrong. Please try again.");
+      setStatus("error");
+      setTimeout(() => setStatus("idle"), 4000);
     }
   }, []);
 
   return (
     <section id="contact-us" className="bg-transparent py-24 px-6 min-h-screen selection:bg-purple-100 overflow-x-hidden">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
         <motion.div 
           initial="hidden"
           whileInView="visible"
@@ -121,7 +155,6 @@ const Contact = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-          {/* Contact Details */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -145,7 +178,6 @@ const Contact = () => {
             </div>
           </motion.div>
 
-          {/* Form Section */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -169,20 +201,19 @@ const Contact = () => {
               ) : (
                 <motion.form
                   key="form"
+                  ref={formRef}
                   onSubmit={handleSubmit}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="space-y-6"
                 >
-                  <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE" />
-                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormInput label="Full Name" name="name" type="text" placeholder="John Doe" />
-                    <FormInput label="Email Address" name="email" type="email" placeholder="john@example.com" />
+                    <FormInput label="Full Name" name="user_name" type="text" placeholder="John Doe" />
+                    <FormInput label="Email Address" name="user_email" type="email" placeholder="john@example.com" />
                   </div>
 
-                  <FormInput label="Phone Number" name="phone" type="tel" placeholder="+92 313 0000000" />
+                  <FormInput label="Phone Number" name="phone" type="tel" placeholder="03020200000" />
 
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-slate-700 ml-1">Your Message</label>
@@ -194,6 +225,13 @@ const Contact = () => {
                       className="w-full px-6 py-4 rounded-2xl bg-white border border-slate-200 focus:border-[#582066] focus:ring-2 focus:ring-purple-100 outline-none transition-all resize-none"
                     ></textarea>
                   </div>
+
+                  {errorMessage && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 text-red-500 text-sm font-medium ml-1">
+                      <AlertCircle size={16} />
+                      {errorMessage}
+                    </motion.div>
+                  )}
 
                   <button
                     type="submit"
@@ -213,7 +251,6 @@ const Contact = () => {
   );
 };
 
-// --- Single Responsibility Input Component ---
 const FormInput = ({ label, ...props }: { label: string; [key: string]: any }) => (
   <div className="space-y-2">
     <label className="text-sm font-bold text-slate-700 ml-1">{label}</label>

@@ -27,19 +27,19 @@ const Hero = () => {
         <div className="space-y-8">
           <div className="space-y-4">
             {/* H1 OPTIMIZED FOR: High-DA Backlinks & Local SEO */}
-            <h1 className="text-5xl md:text-6xl lg:text-6xl font-extrabold text-[#1a1f2d] leading-[1.1]">
-              Secure {" "}
+            <h1 className="text-5xl md:text-6xl lg:text-5xl font-extrabold text-[#1a1f2d] leading-[1.1]">
+              Drive Organic {" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#b14bf4] to-[#6d91fe]">
-                High-DA Backlinks
+                Visibility with
               </span>{" "}
-              & Local SEO For
+              Premium Backlinks &
               <br />
-              Real Growth
+              Targeted Local SEO   
             </h1>
 
             {/* DESCRIPTION OPTIMIZED FOR: Expert in Pakistan, Manual Outreach, White-Hat */}
             <p className="text-[#5e626f] text-lg md:text-xl max-w-md font-medium leading-relaxed">
-              Hi, I&apos;m Asim! As a <strong>Top Local SEO Expert in Pakistan</strong>, I specialize in <strong>Manual Outreach</strong> & <strong>White-Hat Link Building</strong> to help your brand dominate Google search results!
+              Local SEO Expert in Pakistan  <strong>White-Hat Link Building Specialist</strong>, I help brands dominate <strong>Google through</strong> <strong>manual outreach</strong> & <strong>premium backlink strategies</strong> designed for sustainable organic growth.
             </p>
           </div>
 
