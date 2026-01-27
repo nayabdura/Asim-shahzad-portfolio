@@ -27,7 +27,7 @@ const Hero = () => {
         <div className="space-y-8">
           <div className="space-y-4">
             {/* H1 OPTIMIZED FOR: High-DA Backlinks & Local SEO */}
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-[#1a1f2d] leading-[1.1]">
+            <h1 className="text-5xl md:text-6xl lg:text-6xl font-extrabold text-[#1a1f2d] leading-[1.1]">
               Secure {" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#b14bf4] to-[#6d91fe]">
                 High-DA Backlinks

@@ -72,56 +72,56 @@ export default function LandingPage() {
   const renderedSections = useMemo(() => (
     <>
         {/* SECTION: Main */}
-        <div id="main" className="relative h-screen flex items-center justify-center p-6 snap-start bg-transparent">
+        <div id="main" className="relative overflow-x-hidden overflow-y-hidden h-screen flex items-center justify-center p-6 snap-start bg-transparent">
           <div className="w-full max-w-6xl flex justify-center">
             <MainSection />
           </div>
         </div>
 
         {/* SECTION: Who am I? */}
-        <div id="who-am-i" className="snap-start bg-transparent">
+        <div id="who-am-i" className="snap-start overflow-x-hidden bg-transparent">
           <Hero />
         </div>
 
         {/* SECTION: Experience */}
-        <div id="experience" className="min-h-screen flex items-center justify-center snap-start bg-transparent">
+        <div id="experience" className="min-h-screen overflow-x-hidden flex items-center justify-center snap-start bg-transparent">
           <ExperienceSection />
         </div>
 
         {/* SECTION: Partners */}
-        <div id="what-we-do" className="min-h-screen flex items-center justify-center snap-start bg-transparent">
+        <div id="what-we-do" className="min-h-screen overflow-x-hidden flex items-center justify-center snap-start bg-transparent">
           <PartnersSection />
         </div>
 
         {/* SECTION: Portfolio */}
-        <div id="portfolio" className="min-h-screen flex items-center justify-center snap-start bg-transparent">
+        <div id="portfolio" className="min-h-screen flex overflow-x-hidden items-center justify-center snap-start bg-transparent">
           <Portfolio />
         </div>
 
         {/* SECTION: Testimonials */}
-        <div id="testimonials" className="min-h-screen flex items-center justify-center snap-start bg-transparent">
+        <div id="testimonials" className="min-h-screen overflow-x-hidden flex items-center justify-center snap-start bg-transparent">
           <TestimonialsSection />
         </div>
 
         {/* SECTION: Why-Us */}
-        <div id="why-us" className="min-h-screen flex items-center justify-center snap-start bg-transparent">
+        <div id="why-us" className="min-h-screen overflow-x-hidden flex items-center justify-center snap-start bg-transparent">
           <WhyUsSection />
         </div>
 
         {/* SECTION: FAQ */}
-        <div id="faq" className="min-h-screen flex items-center justify-center snap-start bg-transparent">
+        <div id="faq" className="min-h-screen flex overflow-x-hidden items-center justify-center snap-start bg-transparent">
           <FAQSection />
         </div>
 
         {/* SECTION: Contact-us */}
-        <div id="contact-us" className="min-h-screen flex items-center justify-center snap-start bg-transparent">
+        <div id="contact-us" className="min-h-screen overflow-x-hidden flex items-center justify-center snap-start bg-transparent">
           <Contact />
         </div>
     </>
   ), []); // Empty dependency array = render once and stay static
 
   return (
-    <main className="relative flex h-screen w-full overflow-hidden bg-white font-sans text-slate-900">
+    <main className="relative flex h-screen overflow-x-hidden w-full overflow-hidden bg-white font-sans text-slate-900">
       
       {/* Optimized Background */}
       <BlobBackground />
@@ -140,7 +140,7 @@ export default function LandingPage() {
       {/* MAIN SCROLLABLE AREA */}
       <section 
         ref={scrollContainerRef}
-        className="relative flex-1 h-full overflow-y-auto scroll-smooth snap-y snap-mandatory z-10"
+        className="relative flex-1 h-full overflow-x-hidden overflow-y-auto scroll-smooth snap-y snap-mandatory z-10"
       >
         {renderedSections}
       </section>

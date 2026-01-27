@@ -1,44 +1,89 @@
 "use client";
 
-import React, { memo } from 'react';
+import React, { memo, MouseEvent } from 'react';
+import { motion, Variants } from 'framer-motion';
 import '../styles/home.css';
 
-const MainSection = () => {
+const MainSection: React.FC = () => {
+  // Explicitly typing the variants as 'Variants'
+  const fadeInUp: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { 
+        duration: 0.6, 
+        ease: "easeOut" // Framer Motion prefers specific strings or easing arrays
+      } 
+    }
+  };
+
+  const staggerContainer: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  // Typed 'e' as a React MouseEvent for an anchor element
+  const scrollToContact = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    // 'home image' class suggests background image. 
-    // Ensure styles/home.css is optimized for LCP.
-    <section className="home image" id="main">
-      <div>
-        <div className="position-relative"> 
-          <h1>
-            <span>
-              <span className="animated-layer">
-                Hello<span>.</span>
-              </span>
-            </span>
-            <span className="position-relative">
-              <span className="animated-layer">I am</span>
-              <span className="intro animated-layer">
-                Local SEO Expert & Link Builder with 3 years of experience, <br/> Based in Pakistan 🇵🇰
-              </span>
-            </span>
-            <span>
-              <span className="animated-layer">Asim </span>
-            </span>
-          </h1>
-        </div>
-      </div>
-      
-      {/* CALL TO ACTION */}
-      {/* Added aria-label for accessibility since span has no text */}
-      <span 
-        className="animated-layer animated-btn cta" 
-        id="cta" 
-        role="button" 
-        aria-label="Scroll down"
+    <section className="home-hero" id="main" aria-label="Introduction">
+      <motion.div 
+        className="hero-container"
+        initial="hidden"
+        animate="visible"
+        variants={staggerContainer}
       >
-        <span></span>
-      </span>
+        <header className="hero-content">
+          <motion.h2 variants={fadeInUp} className="sub-heading">
+            Professional Link Building Services
+          </motion.h2>
+          
+          <motion.h1 variants={fadeInUp} className="main-title">
+            Hello, I'm <br />
+            <span className="gradient-text">Asim, Local SEO Expert</span>
+          </motion.h1>
+
+          <motion.p variants={fadeInUp} className="description">
+            I help businesses increase organic traffic and <strong>rank #1 on Google</strong> through 
+            strategic <strong>Link Building</strong> and data-driven Local SEO. 
+            Based in Pakistan, serving clients globally.
+          </motion.p>
+          
+          <motion.div variants={fadeInUp} className="cta-wrapper">
+            <a 
+            id='contact'
+              href="/contact" 
+              onClick={scrollToContact} 
+              className="primary-btn" 
+              title="Contact Asim for SEO Services"
+            >
+              Hire Me
+            </a>
+            <div className="exp-info" aria-label="3 years of experience">
+              <span className="number">3+</span>
+              <span className="label">Years of <br/>Proven Results</span>
+            </div>
+          </motion.div>
+        </header>
+
+        <span className="sr-only">
+          Asim is a Pakistan-based SEO specialist providing backlink strategy, 
+          Google Maps optimization, and search engine marketing services.
+        </span>
+      </motion.div>
     </section>
   );
 };

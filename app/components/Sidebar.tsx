@@ -91,7 +91,7 @@ const Sidebar = ({ activeSection, onNavigate }: SidebarProps) => {
       </div>
 
       {/* --- MIDDLE SECTION: Navigation --- */}
-      <nav className="flex flex-1 flex-col gap-y-4 overflow-y-auto overflow-x-hidden scrollbar-hide">
+      <nav className="flex flex-1 flex-col gap-y-2 overflow-y-hidden overflow-x-hidden scrollbar-hide">
         {navItems.map((item) => (
           <SidebarItem 
             key={item.id}
@@ -103,11 +103,11 @@ const Sidebar = ({ activeSection, onNavigate }: SidebarProps) => {
       </nav>
 
       {/* --- BOTTOM SECTION: Static Card (No re-renders needed) --- */}
-      <div className="mt-8">
+      <div className="mt-2">
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 p-5 shadow-lg text-white">
           
           {/* Decorative blurred circle */}
-          <div className="absolute -top-6 -right-6 h-16 w-16 rounded-full bg-cyan-500 blur-2xl opacity-40 pointer-events-none"></div>
+          <div className="absolute -top-3 -right-6 h-16 w-16 rounded-full bg-cyan-500 blur-2xl opacity-40 pointer-events-none"></div>
 
           {/* Content */}
           <div className="relative z-10">
